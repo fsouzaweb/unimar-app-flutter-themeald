@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../models/recipe_model.dart';
 import 'package:http/http.dart' as http;
+import 'dart:io'; // Importa o pacote para SocketException
 
 class RecipeController extends ChangeNotifier {
   List<Recipe> _favorites = [];
@@ -11,24 +12,33 @@ class RecipeController extends ChangeNotifier {
     _loadFavorites();
   }
 
-// Método para buscar receitas da API
+  // Método para buscar receitas da API
   Future<List<Recipe>> fetchRecipes() async {
-    final response = await http.get(
-      Uri.parse('https://www.themealdb.com/api/json/v1/1/search.php?s='),
-    );
+    try {
+      final response = await http.get(
+        Uri.parse('https://www.themealdb.com/api/json/v1/1/search.php?s='),
+      );
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
 
-      // Verificação se a resposta contém 'meals'
-      if (data['meals'] != null) {
-        final List<dynamic> recipesJson = data['meals'];
-        return recipesJson.map((json) => Recipe.fromJson(json)).toList();
+        // Verificação se a resposta contém 'meals'
+        if (data['meals'] != null) {
+          final List<dynamic> recipesJson = data['meals'];
+          return recipesJson.map((json) => Recipe.fromJson(json)).toList();
+        } else {
+          return []; // Retorna uma lista vazia se não houver receitas
+        }
       } else {
-        return []; // Retorna uma lista vazia se não houver receitas
+        throw Exception(
+            'Erro ${response.statusCode}: Falha ao carregar as receitas da API');
       }
-    } else {
-      throw Exception('Falha ao carregar as receitas da API');
+    } on SocketException {
+      throw Exception('Erro de rede: Verifique sua conexão com a internet.');
+    } on http.ClientException catch (e) {
+      throw Exception('Erro de cliente: $e');
+    } catch (e) {
+      throw Exception('Erro inesperado: $e');
     }
   }
 
