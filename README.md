@@ -26,7 +26,7 @@ Aplicativo em Flutter/Dart para visualização e gerenciamento de receitas, incl
 Para clonar o repositório e navegar até a pasta do projeto, execute:
 
 ```bash
-git clone https://github.com/fsouzaweb/unimar-flutter-recipes && cd unimar-flutter-recipes
+git clone https://github.com/fsouzaweb/unimar-app-flutter-themeald && cd unimar-app-flutter-themeald
 ```
  
 2. **Instale as dependências do projeto**:
